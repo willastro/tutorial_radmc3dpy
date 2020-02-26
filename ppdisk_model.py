@@ -11,7 +11,7 @@ setup.problemSetupDust('ppdisk', mdisk='1e-5*ms', gap_rin='[10.0*au, 30.0*au, 60
 data_den = analyze.readData(ddens=True)										# read the input density distribution
 
 #Plot opacities
-opac = analyze.readOpac(ext=['silicate'])									# read the silicate opacity
+opac = analyze.readOpac(ext=['silicate_ice_thin_ossenkopf'])									# read the silicate opacity
 plt.loglog(opac.wav[0], opac.kabs[0], opac.ksca[0])
 plt.xlabel(r'$\lambda$ [$\mu$m]')
 plt.ylabel(r'$\kappa_{\rm abs}$ [cm$^2$/g]')
@@ -35,7 +35,7 @@ plt.show()
 
 #Run MC
 import os
-#os.system('radmc3d mctherm')
+os.system('radmc3d mctherm')
 
 #Read and plot Temperature
 data_tem = analyze.readData(dtemp=True)
@@ -50,10 +50,19 @@ c = plt.contour(data_tem.grid.x/natconst.au, np.pi/2.-data_tem.grid.y, data_tem.
 plt.clabel(c, inline=1, fontsize=10)
 plt.show()
 
+#exit()
+#Calculate SED and plot
+#os.system('radmc3d sed')
+os.system('radmc3d spectrum incl 60 phi 0 lambdarange 1 50 nlam 50 setthreads 8')
+sed = analyze.readSpectrum('spectrum.out')
+analyze.plotSpectrum(sed,xlg=True, ylg=True,nufnu=True,micron=True,dpc=140.)
+plt.show()
 
+"""
 #Create images using RADMC-3D
-image.makeImage(npix=300., wav=1300., incl=20., phi=0., sizeau=300.)
+image.makeImage(npix=300., wav=1300, incl=60., phi=0., sizeau=300.)
 im = image.readImage()
+
 image.plotImage(im, au=True, log=True, cmap=plt.cm.gist_heat)
 plt.show()
 
@@ -61,7 +70,7 @@ image.plotImage(im, arcsec=True, dpc=140., log=True, bunit='snu', cmap=plt.cm.gi
 plt.show()
 
 
-cim = im.imConv(fwhm=[0.06, 0.06], pa=0., dpc=140.) 															   #convoluted image
+cim = im.imConv(fwhm=[0.035, 0.035], pa=0., dpc=140.) 															   #convoluted image
 image.plotImage(cim, arcsec=True, dpc=140., log=True, bunit='snu', cmap=plt.cm.gist_heat)
 plt.show()
 
@@ -69,8 +78,9 @@ plt.show()
 image.plotImage(cim, arcsec=True, dpc=140., log=True, bunit='snu', cmask_rad=0.17, cmap=plt.cm.gist_heat) # corographaphic mask
 plt.show()
 
-
-
+dat = [1,10,50]
+image.radmc3dImage.getVisibility(im,bl=dat,pa=43,dpc=240)
+"""
 
 
 exit()
